@@ -41,69 +41,110 @@ import threading
 import time
 
 # Reduce displayed waveforms to avoid display freezes
-CSI_VAID_SUBCARRIER_INTERVAL = 3
+CSI_VAID_SUBCARRIER_INTERVAL = 1
 
-# Remove invalid subcarriers
-# secondary channel : below, HT, 40 MHz, non STBC, v, HT-LFT: 0~63, -64~-1, 384
 csi_vaid_subcarrier_index = []
 csi_vaid_subcarrier_color = []
 color_step = 255 // (28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)
+color_step_57 = 255 // (57 // CSI_VAID_SUBCARRIER_INTERVAL + 1)
 
-# LLTF: 52
-csi_vaid_subcarrier_index += [i for i in range(6, 32, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
-csi_vaid_subcarrier_color += [(i * color_step, 0, 0) for i in range(1,  26 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
-csi_vaid_subcarrier_index += [i for i in range(33, 59, CSI_VAID_SUBCARRIER_INTERVAL)]    # 26  green
-csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  26 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
-CSI_DATA_LLFT_COLUMNS = len(csi_vaid_subcarrier_index)
+csi_vaid_subcarrier_index += [i for i in range(0, 28, CSI_VAID_SUBCARRIER_INTERVAL)]    
+csi_vaid_subcarrier_color += [(i * color_step, 0, 0) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
 
-# HT-LFT: 56 + 56
-csi_vaid_subcarrier_index += [i for i in range(66, 94, CSI_VAID_SUBCARRIER_INTERVAL)]    # 28  blue
-csi_vaid_subcarrier_color += [(0, 0, i * color_step) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
-csi_vaid_subcarrier_index += [i for i in range(95, 123, CSI_VAID_SUBCARRIER_INTERVAL)]   # 28  White
-csi_vaid_subcarrier_color += [(i * color_step, i * color_step, i * color_step) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
-# csi_vaid_subcarrier_index += [i for i in range(124, 162)]  # 28  White
-# csi_vaid_subcarrier_index += [i for i in range(163, 191)]  # 28  White
+csi_vaid_subcarrier_index += [i for i in range(28, 29, CSI_VAID_SUBCARRIER_INTERVAL)]    
+csi_vaid_subcarrier_color += [(255, 255, 255) for i in range(1,  1 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+csi_vaid_subcarrier_index += [i for i in range(29, 57, CSI_VAID_SUBCARRIER_INTERVAL)]   
+csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+CSI_DATA_114_COLUMNS = len(csi_vaid_subcarrier_index)
+
+csi_vaid_subcarrier_index += [i for i in range(57, 60, CSI_VAID_SUBCARRIER_INTERVAL)]   
+csi_vaid_subcarrier_color += [(255, 255, 255)] * 3  
+
+csi_vaid_subcarrier_index += [i for i in range(60, 117, CSI_VAID_SUBCARRIER_INTERVAL)]    
+csi_vaid_subcarrier_color += [(0, 0, i * color_step_57) for i in range(1,  57 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+CSI_DATA_234_COLUMNS = len(csi_vaid_subcarrier_index)
+
+csi_vaid_subcarrier_index += [i for i in range(117, 256, CSI_VAID_SUBCARRIER_INTERVAL)]    
+csi_vaid_subcarrier_color += [(0, (i * color_step_57), i * color_step_57) for i in range(1,  139 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
 
 CSI_DATA_INDEX = 200  # buffer size
 CSI_DATA_COLUMNS = len(csi_vaid_subcarrier_index)
-DATA_COLUMNS_NAMES = ["type", "id", "mac", "rssi", "rate", "sig_mode", "mcs", "bandwidth", "smoothing", "not_sounding", "aggregation", "stbc", "fec_coding",
-                      "sgi", "noise_floor", "ampdu_cnt", "channel", "secondary_channel", "local_timestamp", "ant", "sig_len", "rx_state", "len", "first_word", "data"]
+DATA_COLUMNS_NAMES = ["type", "id", "mac", "rssi", "rate","noise_floor","fft_gain","agc_gain", "channel", "local_timestamp",  "sig_len", "rx_state", "len", "first_word", "data"]
 csi_data_array = np.zeros(
-    [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.complex64)
-
+    [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
+csi_data_phase = np.zeros([CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
 class csi_data_graphical_window(QWidget):
     def __init__(self):
         super().__init__()
 
+        # 设置窗口大小为 1280x720
         self.resize(1280, 720)
-        self.plotWidget_ted = PlotWidget(self)
-        self.plotWidget_ted.setGeometry(QtCore.QRect(0, 0, 1280, 720))
 
+        # 创建并设置第一个 PlotWidget 用于展示 CSI 行数据
+        self.plotWidget_ted = PlotWidget(self)
+        self.plotWidget_ted.setGeometry(QtCore.QRect(0, 0, 1280, 360))
         self.plotWidget_ted.setYRange(-20, 100)
         self.plotWidget_ted.addLegend()
 
-        self.csi_amplitude_array = np.abs(csi_data_array)
+        # 初始化 CSI 幅度数据（假设 csi_data_array 是 NumPy 数组）
+        self.csi_amplitude_array = csi_data_array  # np.abs(csi_data_array)
+        self.csi_phase_array = csi_data_phase
+        # 创建并初始化曲线，用于展示 CSI 行数据（红色）
+        self.curve = self.plotWidget_ted.plot([], name="CSI Row Data", pen='r')
+
+        # 创建并设置第二个 PlotWidget 用于展示多条子载波的幅度数据
+        self.plotWidget_multi_data = PlotWidget(self)
+        self.plotWidget_multi_data.setGeometry(QtCore.QRect(0, 360, 1280, 360))  # 下半部分
+        self.plotWidget_multi_data.setYRange(-20, 100)
+        self.plotWidget_multi_data.addLegend()
+
+        # 初始化曲线列表，用于存储每条子载波的曲线
         self.curve_list = []
 
-        # print(f"csi_vaid_subcarrier_color, len: {len(csi_vaid_subcarrier_color)}, {csi_vaid_subcarrier_color}")
-
+        # 假设 csi_vaid_subcarrier_color 是包含每条子载波颜色的列表
         for i in range(CSI_DATA_COLUMNS):
-            curve = self.plotWidget_ted.plot(
+            # 为每条子载波创建曲线，并设置颜色
+            curve = self.plotWidget_multi_data.plot(
                 self.csi_amplitude_array[:, i], name=str(i), pen=csi_vaid_subcarrier_color[i])
             self.curve_list.append(curve)
 
+        # 显示相位
+        # self.plotWidget_phase_data = PlotWidget(self)
+        # self.plotWidget_phase_data.setGeometry(QtCore.QRect(0, 720, 1280, 360))  # 在窗口下半部分显示
+        # self.plotWidget_phase_data.setYRange(-np.pi, np.pi)  # 设置Y轴范围为相位范围（-π 到 π）
+        # self.plotWidget_phase_data.addLegend()
+
+        # # 初始化曲线列表用于展示相位数据
+        # self.curve_phase_list = []
+
+        # # 生成相位波形的曲线
+        # for i in range(CSI_DATA_COLUMNS):
+        #     # 为每条子载波的相位数据创建曲线
+        #     phase_curve = self.plotWidget_phase_data.plot(
+        #         np.angle(self.csi_amplitude_array[:, i]), name=str(i), pen=csi_vaid_subcarrier_color[i])
+        #     self.curve_phase_list.append(phase_curve)
+        
+        # 设置定时器，每 100 毫秒调用一次 update_data 方法更新数据
         self.timer = pq.QtCore.QTimer()
         self.timer.timeout.connect(self.update_data)
         self.timer.start(100)
 
+
     def update_data(self):
-        self.csi_amplitude_array = np.abs(csi_data_array)
+        # 更新幅度数据的最后一行
+        self.csi_row_data = self.csi_amplitude_array[-1, :]
+        self.curve.setData(self.csi_row_data)  # 更新幅度曲线
 
+        # 更新幅度数据的多条子载波曲线
+        self.csi_amplitude_array = csi_data_array
+        self.csi_phase_array = csi_data_phase
         for i in range(CSI_DATA_COLUMNS):
-            self.curve_list[i].setData(self.csi_amplitude_array[:, i])
-
+            self.curve_list[i].setData(self.csi_amplitude_array[:, i])  # 更新幅度曲线
+            # self.curve_phase_list[i].setData(self.csi_phase_array[:, i])  # 更新相位曲线    
 
 def csi_data_read_parse(port: str, csv_writer, log_file_fd):
+    global fft_gains, agc_gains, count, fft_gain_mode, agc_gain_mode, agc_gain, fft_gain
     ser = serial.Serial(port=port, baudrate=921600,
                         bytesize=8, parity='N', stopbits=1)
     if ser.isOpen():
@@ -144,30 +185,37 @@ def csi_data_read_parse(port: str, csv_writer, log_file_fd):
             log_file_fd.write(strings + '\n')
             log_file_fd.flush()
             continue
-
-        # Reference on the length of CSI data and usable subcarriers
-        # https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/wifi.html#wi-fi-channel-state-information
-        if len(csi_raw_data) != 128 and len(csi_raw_data) != 256 and len(csi_raw_data) != 384:
+        
+        if len(csi_raw_data) != 128 and len(csi_raw_data) != 256 and len(csi_raw_data) != 384 and len(csi_raw_data) != 106 and len(csi_raw_data) != 114 and len(csi_raw_data) != 234 :
             print(f"element number is not equal: {len(csi_raw_data)}")
             log_file_fd.write(f"element number is not equal: {len(csi_raw_data)}\n")
             log_file_fd.write(strings + '\n')
             log_file_fd.flush()
-            continue
+            # continue
 
         csv_writer.writerow(csi_data)
 
         # Rotate data to the left
         csi_data_array[:-1] = csi_data_array[1:]
+        csi_data_phase[:-1] = csi_data_phase[1:]
 
-        if len(csi_raw_data) == 128:
+        if len(csi_raw_data) == 106:
+            csi_vaid_subcarrier_len = CSI_DATA_106_COLUMNS
+        elif  len(csi_raw_data) == 114:
+            csi_vaid_subcarrier_len = CSI_DATA_114_COLUMNS
+        elif  len(csi_raw_data) == 128 :
             csi_vaid_subcarrier_len = CSI_DATA_LLFT_COLUMNS
-        else:
-            csi_vaid_subcarrier_len = CSI_DATA_COLUMNS
+        elif  len(csi_raw_data) == 234 :
+            csi_vaid_subcarrier_len = CSI_DATA_234_COLUMNS
+        else :
+            csi_vaid_subcarrier_len = int(len(csi_raw_data)/2)
 
         for i in range(csi_vaid_subcarrier_len):
-            csi_data_array[-1][i] = complex(csi_raw_data[csi_vaid_subcarrier_index[i] * 2 + 1],
-                                            csi_raw_data[csi_vaid_subcarrier_index[i] * 2])
+            csi_data_phase[-1][i] = np.angle(complex(csi_raw_data[csi_vaid_subcarrier_index[i] * 2 + 1],
+                                           csi_raw_data[csi_vaid_subcarrier_index[i] * 2]))
 
+            csi_data_array[-1][i] = np.abs(complex(csi_raw_data[csi_vaid_subcarrier_index[i] * 2 + 1],
+                                            csi_raw_data[csi_vaid_subcarrier_index[i] * 2]))
     ser.close()
     return
 
