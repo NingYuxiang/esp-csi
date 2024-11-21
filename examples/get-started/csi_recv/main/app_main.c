@@ -72,6 +72,16 @@ typedef struct
      */
     extern void phy_force_rx_gain(int force_en, int force_value);
 #endif
+void phy_i2c_writeReg(int8_t block, int8_t id, int8_t addr, int data);
+int8_t phy_i2c_readReg(int8_t block, int8_t id, int8_t addr);
+void esp_adjust_filter_bandwidth_c5(void) {
+    int8_t rx_dcap0 = phy_i2c_readReg(0x67, 1, 6);
+    int8_t rx_dcap1 = phy_i2c_readReg(0x67, 1, 7);
+    phy_i2c_writeReg(0x67, 1, 6, 5); 
+    phy_i2c_writeReg(0x67, 1, 8, 5); 
+    phy_i2c_writeReg(0x67, 1, 7, 5); 
+    phy_i2c_writeReg(0x67, 1, 9, 5); 
+}
 static void wifi_init()
 {
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -101,6 +111,9 @@ static void wifi_init()
     ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
     ESP_ERROR_CHECK(esp_wifi_set_channel(CONFIG_LESS_INTERFERENCE_CHANNEL, WIFI_SECOND_CHAN_BELOW));
     ESP_ERROR_CHECK(esp_wifi_set_mac(WIFI_IF_STA, CONFIG_CSI_SEND_MAC));
+#if CONFIG_IDF_TARGET_ESP32C5
+    esp_adjust_filter_bandwidth_c5();
+#endif
 }
 
 static void wifi_esp_now_init(esp_now_peer_info_t peer) 
@@ -115,6 +128,7 @@ static void wifi_esp_now_init(esp_now_peer_info_t peer)
     };
     ESP_ERROR_CHECK(esp_now_add_peer(&peer));
     ESP_ERROR_CHECK(esp_now_set_peer_rate_config(peer.peer_addr,&rate_config));
+
 }
 
 static void wifi_csi_rx_cb(void *ctx, wifi_csi_info_t *info)
