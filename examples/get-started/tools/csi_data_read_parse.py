@@ -43,30 +43,57 @@ import time
 # Reduce displayed waveforms to avoid display freezes
 CSI_VAID_SUBCARRIER_INTERVAL = 1
 
+# Remove invalid subcarriers
+# secondary channel : below, HT, 40 MHz, non STBC, v, HT-LFT: 0~63, -64~-1, 384
 csi_vaid_subcarrier_index = []
 csi_vaid_subcarrier_color = []
 color_step = 255 // (28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)
 color_step_57 = 255 // (57 // CSI_VAID_SUBCARRIER_INTERVAL + 1)
-
-csi_vaid_subcarrier_index += [i for i in range(0, 28, CSI_VAID_SUBCARRIER_INTERVAL)]    
+# LLTF: 52
+csi_vaid_subcarrier_index += [i for i in range(0, 28, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
 csi_vaid_subcarrier_color += [(i * color_step, 0, 0) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
 
-csi_vaid_subcarrier_index += [i for i in range(28, 29, CSI_VAID_SUBCARRIER_INTERVAL)]    
+csi_vaid_subcarrier_index += [i for i in range(28, 29, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
 csi_vaid_subcarrier_color += [(255, 255, 255) for i in range(1,  1 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
 
-csi_vaid_subcarrier_index += [i for i in range(29, 57, CSI_VAID_SUBCARRIER_INTERVAL)]   
+csi_vaid_subcarrier_index += [i for i in range(29, 57, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
 csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+# csi_vaid_subcarrier_index += [i for i in range(33, 53, CSI_VAID_SUBCARRIER_INTERVAL)]    # 24
+# csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  20 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
+CSI_DATA_106_COLUMNS = len(csi_vaid_subcarrier_index)
+
+# csi_vaid_subcarrier_index += [i for i in range(32, 57, CSI_VAID_SUBCARRIER_INTERVAL)]    # 24
+# csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  25 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
 CSI_DATA_114_COLUMNS = len(csi_vaid_subcarrier_index)
+print("CSI_DATA_114_COLUMNS",CSI_DATA_114_COLUMNS)
+# 57-59 green
+# csi_vaid_subcarrier_index += [i for i in range(57, 59, CSI_VAID_SUBCARRIER_INTERVAL)]    # 3
+# csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  2 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
+CSI_DATA_LLFT_COLUMNS = len(csi_vaid_subcarrier_index)
 
-csi_vaid_subcarrier_index += [i for i in range(57, 60, CSI_VAID_SUBCARRIER_INTERVAL)]   
-csi_vaid_subcarrier_color += [(255, 255, 255)] * 3  
+# csi_vaid_subcarrier_index += [i for i in range(33, 59, CSI_VAID_SUBCARRIER_INTERVAL)]    # 26  green
+# csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  26 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
+# CSI_DATA_LLFT_COLUMNS = len(csi_vaid_subcarrier_index)
 
-csi_vaid_subcarrier_index += [i for i in range(60, 117, CSI_VAID_SUBCARRIER_INTERVAL)]    
+# HT-LFT: 56 + 56
+csi_vaid_subcarrier_index += [i for i in range(57, 60, CSI_VAID_SUBCARRIER_INTERVAL)]    # 28  blue
+csi_vaid_subcarrier_color += [(255, 255, 255)] * 3  # [(255, 255, 255) for i in range(1,  3 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+csi_vaid_subcarrier_index += [i for i in range(60, 117, CSI_VAID_SUBCARRIER_INTERVAL)]    # 28  blue
 csi_vaid_subcarrier_color += [(0, 0, i * color_step_57) for i in range(1,  57 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+
 CSI_DATA_234_COLUMNS = len(csi_vaid_subcarrier_index)
 
-csi_vaid_subcarrier_index += [i for i in range(117, 256, CSI_VAID_SUBCARRIER_INTERVAL)]    
-csi_vaid_subcarrier_color += [(0, (i * color_step_57), i * color_step_57) for i in range(1,  139 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+csi_vaid_subcarrier_index += [i for i in range(117, 123, CSI_VAID_SUBCARRIER_INTERVAL)]    # 28  blue
+csi_vaid_subcarrier_color += [(0, 0, i * color_step) for i in range(1,  6 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+# csi_vaid_subcarrier_index += [i for i in range(95, 123, CSI_VAID_SUBCARRIER_INTERVAL)]   # 28  White
+# csi_vaid_subcarrier_color += [(i * color_step, i * color_step, i * color_step) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
+
+# csi_vaid_subcarrier_index += [i for i in range(124, 162)]  # 28  White
+# csi_vaid_subcarrier_index += [i for i in range(163, 191)]  # 28  White
 
 CSI_DATA_INDEX = 200  # buffer size
 CSI_DATA_COLUMNS = len(csi_vaid_subcarrier_index)
@@ -74,6 +101,16 @@ DATA_COLUMNS_NAMES = ["type", "id", "mac", "rssi", "rate","noise_floor","fft_gai
 csi_data_array = np.zeros(
     [CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
 csi_data_phase = np.zeros([CSI_DATA_INDEX, CSI_DATA_COLUMNS], dtype=np.float64)
+agc_gain_data = np.zeros([CSI_DATA_INDEX], dtype=np.float64)
+fft_gain_data = np.zeros([CSI_DATA_INDEX], dtype=np.float64)
+# 初始化列表用于存储前1000次的fft_gain和agc_gain
+fft_gains = []
+agc_gains = []
+count = 0
+fft_gain_mode = 0
+agc_gain_mode = 0
+agc_gain = 0 
+fft_gain = 0
 class csi_data_graphical_window(QWidget):
     def __init__(self):
         super().__init__()
@@ -109,7 +146,13 @@ class csi_data_graphical_window(QWidget):
                 self.csi_amplitude_array[:, i], name=str(i), pen=csi_vaid_subcarrier_color[i])
             self.curve_list.append(curve)
 
-        # 显示相位
+        agc_curve = self.plotWidget_multi_data.plot(
+            agc_gain_data, name="AGC Gain", pen=[0,255,255])  # 青色
+        fft_curve = self.plotWidget_multi_data.plot(
+            fft_gain_data, name="FFT Gain", pen=[255,255,0])  # 黄色
+        self.curve_list.append(agc_curve)
+        self.curve_list.append(fft_curve)
+
         # self.plotWidget_phase_data = PlotWidget(self)
         # self.plotWidget_phase_data.setGeometry(QtCore.QRect(0, 720, 1280, 360))  # 在窗口下半部分显示
         # self.plotWidget_phase_data.setYRange(-np.pi, np.pi)  # 设置Y轴范围为相位范围（-π 到 π）
@@ -133,6 +176,8 @@ class csi_data_graphical_window(QWidget):
 
     def update_data(self):
         # 更新幅度数据的最后一行
+        self.curve_list[CSI_DATA_COLUMNS].setData(agc_gain_data)
+        self.curve_list[CSI_DATA_COLUMNS+1].setData(fft_gain_data)
         self.csi_row_data = self.csi_amplitude_array[-1, :]
         self.curve.setData(self.csi_row_data)  # 更新幅度曲线
 
@@ -141,7 +186,9 @@ class csi_data_graphical_window(QWidget):
         self.csi_phase_array = csi_data_phase
         for i in range(CSI_DATA_COLUMNS):
             self.curve_list[i].setData(self.csi_amplitude_array[:, i])  # 更新幅度曲线
-            # self.curve_phase_list[i].setData(self.csi_phase_array[:, i])  # 更新相位曲线    
+            # self.curve_phase_list[i].setData(self.csi_phase_array[:, i])  # 更新相位曲线
+
+        # 更新相位数据         
 
 def csi_data_read_parse(port: str, csv_writer, log_file_fd):
     global fft_gains, agc_gains, count, fft_gain_mode, agc_gain_mode, agc_gain, fft_gain
@@ -185,30 +232,54 @@ def csi_data_read_parse(port: str, csv_writer, log_file_fd):
             log_file_fd.write(strings + '\n')
             log_file_fd.flush()
             continue
+        fft_gain = int(csi_data[6])
+        agc_gain = int(csi_data[7])
+        fft_gains.append(fft_gain)
+        agc_gains.append(agc_gain)
+
+        if(count == 100):
+            fft_gain_mode = pd.Series(fft_gains).mode().iloc[0]  # 计算 fft_gain 的众数
+            agc_gain_mode = pd.Series(agc_gains).mode().iloc[0]  # 计算 agc_gain 的众数
+            count = 101
+        elif (count < 100):
+            count = count + 1
+            print(count)
         
+        
+
+        print("FFT Gain:", fft_gain,"AGC Gain:",agc_gain)
+        # Reference on the length of CSI data and usable subcarriers
+        # https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/wifi.html#wi-fi-channel-state-information
         if len(csi_raw_data) != 128 and len(csi_raw_data) != 256 and len(csi_raw_data) != 384 and len(csi_raw_data) != 106 and len(csi_raw_data) != 114 and len(csi_raw_data) != 234 :
             print(f"element number is not equal: {len(csi_raw_data)}")
             log_file_fd.write(f"element number is not equal: {len(csi_raw_data)}\n")
             log_file_fd.write(strings + '\n')
             log_file_fd.flush()
-            # continue
+            continue
 
         csv_writer.writerow(csi_data)
 
         # Rotate data to the left
         csi_data_array[:-1] = csi_data_array[1:]
         csi_data_phase[:-1] = csi_data_phase[1:]
-
+        agc_gain_data[:-1] = agc_gain_data[1:]
+        fft_gain_data[:-1] = fft_gain_data[1:]
+        agc_gain_data[-1] = agc_gain
+        fft_gain_data[-1] = fft_gain
+        # print("len(csi_raw_data): ", len(csi_raw_data))
         if len(csi_raw_data) == 106:
             csi_vaid_subcarrier_len = CSI_DATA_106_COLUMNS
         elif  len(csi_raw_data) == 114:
             csi_vaid_subcarrier_len = CSI_DATA_114_COLUMNS
+            print("csi_vaid_subcarrier_len",csi_vaid_subcarrier_len)
         elif  len(csi_raw_data) == 128 :
             csi_vaid_subcarrier_len = CSI_DATA_LLFT_COLUMNS
         elif  len(csi_raw_data) == 234 :
             csi_vaid_subcarrier_len = CSI_DATA_234_COLUMNS
         else :
-            csi_vaid_subcarrier_len = int(len(csi_raw_data)/2)
+            csi_vaid_subcarrier_len = CSI_DATA_COLUMNS
+
+
 
         for i in range(csi_vaid_subcarrier_len):
             csi_data_phase[-1][i] = np.angle(complex(csi_raw_data[csi_vaid_subcarrier_index[i] * 2 + 1],
@@ -216,6 +287,9 @@ def csi_data_read_parse(port: str, csv_writer, log_file_fd):
 
             csi_data_array[-1][i] = np.abs(complex(csi_raw_data[csi_vaid_subcarrier_index[i] * 2 + 1],
                                             csi_raw_data[csi_vaid_subcarrier_index[i] * 2]))
+            csi_data_array[-1][i] = 10.0 ** (-((agc_gain - agc_gain_mode) + (fft_gain - fft_gain_mode) / 4) / 20) * csi_data_array[-1][i]
+
+
     ser.close()
     return
 
