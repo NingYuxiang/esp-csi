@@ -50,51 +50,76 @@ csi_vaid_subcarrier_color = []
 color_step = 255 // (28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)
 color_step_57 = 255 // (57 // CSI_VAID_SUBCARRIER_INTERVAL + 1)
 # LLTF: 52
-csi_vaid_subcarrier_index += [i for i in range(0, 28, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
-csi_vaid_subcarrier_color += [(i * color_step, 0, 0) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
 
-csi_vaid_subcarrier_index += [i for i in range(28, 29, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
-csi_vaid_subcarrier_color += [(255, 255, 255) for i in range(1,  1 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
 
-csi_vaid_subcarrier_index += [i for i in range(29, 57, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
-csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
-
+CSI_DATA_106_COLUMNS = len(csi_vaid_subcarrier_index)
 # csi_vaid_subcarrier_index += [i for i in range(33, 53, CSI_VAID_SUBCARRIER_INTERVAL)]    # 24
 # csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  20 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
-CSI_DATA_106_COLUMNS = len(csi_vaid_subcarrier_index)
 
 # csi_vaid_subcarrier_index += [i for i in range(32, 57, CSI_VAID_SUBCARRIER_INTERVAL)]    # 24
 # csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  25 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
-CSI_DATA_114_COLUMNS = len(csi_vaid_subcarrier_index)
-print("CSI_DATA_114_COLUMNS",CSI_DATA_114_COLUMNS)
+
+# print("CSI_DATA_114_COLUMNS",CSI_DATA_114_COLUMNS)
 # 57-59 green
 # csi_vaid_subcarrier_index += [i for i in range(57, 59, CSI_VAID_SUBCARRIER_INTERVAL)]    # 3
 # csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  2 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
-CSI_DATA_LLFT_COLUMNS = len(csi_vaid_subcarrier_index)
+
 
 # csi_vaid_subcarrier_index += [i for i in range(33, 59, CSI_VAID_SUBCARRIER_INTERVAL)]    # 26  green
 # csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  26 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
 # CSI_DATA_LLFT_COLUMNS = len(csi_vaid_subcarrier_index)
 
-# HT-LFT: 56 + 56
-csi_vaid_subcarrier_index += [i for i in range(57, 60, CSI_VAID_SUBCARRIER_INTERVAL)]    # 28  blue
-csi_vaid_subcarrier_color += [(255, 255, 255)] * 3  # [(255, 255, 255) for i in range(1,  3 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+########################## c6
+csi_vaid_subcarrier_index += [i for i in range(0, 32, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
+csi_vaid_subcarrier_color += [(i * color_step, 0, 0) for i in range(1,  32 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
 
-csi_vaid_subcarrier_index += [i for i in range(60, 117, CSI_VAID_SUBCARRIER_INTERVAL)]    # 28  blue
-csi_vaid_subcarrier_color += [(0, 0, i * color_step_57) for i in range(1,  57 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+csi_vaid_subcarrier_index += [i for i in range(32,64, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
+csi_vaid_subcarrier_color += [(0,i * color_step, 0) for i in range(1,  32 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+CSI_DATA_128_COLUMNS = len(csi_vaid_subcarrier_index)
+
+csi_vaid_subcarrier_index += [i for i in range(64, 128, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
+csi_vaid_subcarrier_color += [(0, 0,i * color_step) for i in range(1,  64 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
 
 
-CSI_DATA_234_COLUMNS = len(csi_vaid_subcarrier_index)
 
-csi_vaid_subcarrier_index += [i for i in range(117, 123, CSI_VAID_SUBCARRIER_INTERVAL)]    # 28  blue
-csi_vaid_subcarrier_color += [(0, 0, i * color_step) for i in range(1,  6 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+CSI_DATA_256_COLUMNS = len(csi_vaid_subcarrier_index)
+csi_vaid_subcarrier_index += [i for i in range(128, 192, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
+csi_vaid_subcarrier_color += [(0,0, i * color_step) for i in range(1,  64 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+csi_vaid_subcarrier_index += [i for i in range(192, 256, CSI_VAID_SUBCARRIER_INTERVAL)]   # 28  White
+csi_vaid_subcarrier_color += [(0, 0,i * color_step/2) for i in range(1,  64 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+CSI_DATA_512_COLUMNS = len(csi_vaid_subcarrier_index)
+
+########################## c5
+
+# csi_vaid_subcarrier_index += [i for i in range(0, 28, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
+# csi_vaid_subcarrier_color += [(i * color_step, 0, 0) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+# csi_vaid_subcarrier_index += [i for i in range(28, 29, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
+# csi_vaid_subcarrier_color += [(255, 255, 255) for i in range(1,  1 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+# csi_vaid_subcarrier_index += [i for i in range(29, 57, CSI_VAID_SUBCARRIER_INTERVAL)]     # 26  red
+# csi_vaid_subcarrier_color += [(0, i * color_step, 0) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+# CSI_DATA_114_COLUMNS = len(csi_vaid_subcarrier_index)
+# # HT-LFT: 56 + 56
+# csi_vaid_subcarrier_index += [i for i in range(57, 60, CSI_VAID_SUBCARRIER_INTERVAL)]    # 28  blue
+# csi_vaid_subcarrier_color += [(255, 255, 255)] * 3  # [(255, 255, 255) for i in range(1,  3 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+# csi_vaid_subcarrier_index += [i for i in range(60, 117, CSI_VAID_SUBCARRIER_INTERVAL)]    # 28  blue
+# csi_vaid_subcarrier_color += [(0, 0, i * color_step_57) for i in range(1,  57 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
+
+# CSI_DATA_234_COLUMNS = len(csi_vaid_subcarrier_index)
+########################## 
+# csi_vaid_subcarrier_index += [i for i in range(117, 123, CSI_VAID_SUBCARRIER_INTERVAL)]    # 28  blue
+# csi_vaid_subcarrier_color += [(0, 0, i * color_step) for i in range(1,  6 // CSI_VAID_SUBCARRIER_INTERVAL + 1)]
 
 # csi_vaid_subcarrier_index += [i for i in range(95, 123, CSI_VAID_SUBCARRIER_INTERVAL)]   # 28  White
 # csi_vaid_subcarrier_color += [(i * color_step, i * color_step, i * color_step) for i in range(1,  28 // CSI_VAID_SUBCARRIER_INTERVAL + 2)]
 
 # csi_vaid_subcarrier_index += [i for i in range(124, 162)]  # 28  White
 # csi_vaid_subcarrier_index += [i for i in range(163, 191)]  # 28  White
-
+CSI_DATA_LLFT_COLUMNS = len(csi_vaid_subcarrier_index)
 CSI_DATA_INDEX = 200  # buffer size
 CSI_DATA_COLUMNS = len(csi_vaid_subcarrier_index)
 DATA_COLUMNS_NAMES = ["type", "id", "mac", "rssi", "rate","noise_floor","fft_gain","agc_gain", "channel", "local_timestamp",  "sig_len", "rx_state", "len", "first_word", "data"]
@@ -217,12 +242,12 @@ def csi_data_read_parse(port: str, csv_writer, log_file_fd):
         csv_reader = csv.reader(StringIO(strings))
         csi_data = next(csv_reader)
 
-        if len(csi_data) != len(DATA_COLUMNS_NAMES):
-            print("element number is not equal")
-            log_file_fd.write("element number is not equal\n")
-            log_file_fd.write(strings + '\n')
-            log_file_fd.flush()
-            continue
+        # if len(csi_data) != len(DATA_COLUMNS_NAMES):
+        #     print(f"element number is not equal: {len(csi_data)}")
+        #     log_file_fd.write(f"element number is not equal: {len(csi_data)}\n")
+        #     log_file_fd.write(strings + '\n')
+        #     log_file_fd.flush()
+        #     continue
 
         try:
             csi_raw_data = json.loads(csi_data[-1])
@@ -250,7 +275,7 @@ def csi_data_read_parse(port: str, csv_writer, log_file_fd):
         print("FFT Gain:", fft_gain,"AGC Gain:",agc_gain)
         # Reference on the length of CSI data and usable subcarriers
         # https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/wifi.html#wi-fi-channel-state-information
-        if len(csi_raw_data) != 128 and len(csi_raw_data) != 256 and len(csi_raw_data) != 384 and len(csi_raw_data) != 106 and len(csi_raw_data) != 114 and len(csi_raw_data) != 234 :
+        if len(csi_raw_data) != 128 and len(csi_raw_data) != 256 and len(csi_raw_data) != 384 and len(csi_raw_data) != 106 and len(csi_raw_data) != 114 and len(csi_raw_data) != 234 and len(csi_raw_data) != 512:
             print(f"element number is not equal: {len(csi_raw_data)}")
             log_file_fd.write(f"element number is not equal: {len(csi_raw_data)}\n")
             log_file_fd.write(strings + '\n')
@@ -271,13 +296,16 @@ def csi_data_read_parse(port: str, csv_writer, log_file_fd):
             csi_vaid_subcarrier_len = CSI_DATA_106_COLUMNS
         elif  len(csi_raw_data) == 114:
             csi_vaid_subcarrier_len = CSI_DATA_114_COLUMNS
-            print("csi_vaid_subcarrier_len",csi_vaid_subcarrier_len)
         elif  len(csi_raw_data) == 128 :
-            csi_vaid_subcarrier_len = CSI_DATA_LLFT_COLUMNS
+            csi_vaid_subcarrier_len = CSI_DATA_128_COLUMNS
+        elif  len(csi_raw_data) == 256 :
+            csi_vaid_subcarrier_len = CSI_DATA_256_COLUMNS
         elif  len(csi_raw_data) == 234 :
             csi_vaid_subcarrier_len = CSI_DATA_234_COLUMNS
+        elif  len(csi_raw_data) == 512 :
+            csi_vaid_subcarrier_len = CSI_DATA_512_COLUMNS
         else :
-            csi_vaid_subcarrier_len = CSI_DATA_COLUMNS
+            csi_vaid_subcarrier_len = (int)(len(csi_raw_data)/2)
 
 
 
